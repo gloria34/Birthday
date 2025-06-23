@@ -4,5 +4,16 @@
     <dict>
         <key>CADisableMinimumFrameDurationOnPhone</key>
         <true/>
+        <key>NSAppTransportSecurity</key>
+        <dict>
+            <key>NSExceptionDomains</key>
+            <dict>
+                <key>192.168.0.118</key>
+                <dict>
+                    <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key><true/>
+                    <key>NSTemporaryExceptionAllowsInsecureHTTPLoadsForWebSockets</key><true/>
+                </dict>
+            </dict>
+        </dict>
     </dict>
 </plist>
