@@ -28,6 +28,7 @@ class InitializationViewModel() : ViewModel() {
                     port = port,
                     path = "/nanit"
                 ) {
+                    send(Frame.Text("HappyBirthday"))
                     for (frame in incoming) {
                         when (frame) {
                             is Frame.Text -> {
