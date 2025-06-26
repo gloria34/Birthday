@@ -71,11 +71,19 @@ private fun BirthdayContent(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(
+            modifier = Modifier.height(topBarHeight)
+        )
+        Spacer(
+            modifier = Modifier.weight(1f).defaultMinSize(
+                minHeight = 22.dp
+            )
+        )
         Text(
             "Today $name is".toUpperCasePreservingASCIIRules(),
             modifier = Modifier
                 .wrapContentSize()
-                .padding(start = 55.dp, end = 55.dp, top = topBarHeight + 22.dp),
+                .padding(start = 55.dp, end = 55.dp),
             maxLines = 2,
             textAlign = TextAlign.Center,
             style = TextStyle(
@@ -94,7 +102,11 @@ private fun BirthdayContent(
                 fontSize = 21.sp
             )
         )
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(
+            modifier = Modifier.weight(1f).defaultMinSize(
+                minHeight = 15.dp
+            )
+        )
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -102,8 +114,7 @@ private fun BirthdayContent(
         ) {
             PlatformImage(avatarPlaceholder)
         }
-        Spacer(modifier = Modifier.weight(1f))
-        Spacer(modifier = Modifier.height(167.dp))
+        Spacer(modifier = Modifier.height(134.dp))
     }
 }
 
@@ -141,8 +152,7 @@ private fun BirthdayBackgroundImage(backgroundImage: String, modifier: Modifier 
 private fun BirthdayBottomBar() {
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 53.dp),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -150,30 +160,7 @@ private fun BirthdayBottomBar() {
             SvgIcons.NANIT_LOGO,
             modifier = Modifier.height(19.dp).width(58.dp)
         )
-        Spacer(modifier = Modifier.height(53.dp))
-        Button(
-            onClick = { },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = AppColors.LightCoral,
-                contentColor = AppColors.White
-            ),
-            modifier = Modifier.height(42.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) {
-            Text(
-                "Share the news",
-                style = TextStyle(
-                    color = AppColors.White,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 16.sp
-                ),
-                modifier = Modifier.padding(start = 21.dp, end = 5.dp)
-            )
-            PlatformImage(
-                SvgIcons.SHARE,
-                modifier = Modifier.height(33.dp).width(30.dp).padding(end = 11.dp)
-            )
-        }
+        Spacer(modifier = Modifier.height(109.dp))
     }
 }
 

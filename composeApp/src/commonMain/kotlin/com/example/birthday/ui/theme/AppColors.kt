@@ -8,5 +8,4 @@ object AppColors {
     val Blue = Color(0xFFDAF1F6)
     val NavyBlue = Color(0xFF394562)
     val White = Color(0xFFFFFFFF)
-    val LightCoral = Color(0xFFEF7B7B)
 }
