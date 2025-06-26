@@ -1,24 +1,26 @@
-package com.example.birthday.ui.screens
+package com.example.birthday.ui.screens.initialization
 
 import androidx.lifecycle.ViewModel
+import com.example.birthday.data.models.BirthdayInfo
 import com.example.birthday.network.createHttpClient
-import io.ktor.client.plugins.websocket.webSocket
-import io.ktor.http.HttpMethod
-import io.ktor.websocket.Frame
-import io.ktor.websocket.readText
+import io.ktor.client.plugins.websocket.*
+import io.ktor.http.*
+import io.ktor.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 class InitializationViewModel() : ViewModel() {
-    private val _messages = MutableSharedFlow<String>()
-    val messages: SharedFlow<String> = _messages
     var ip: String = "192.168.0.147"
     var port: Int = 8080
 
-    fun connectToTheServer() {
+    fun connectToTheServer(onBirthdayInfoReceived: (BirthdayInfo) -> Unit) {
+        val json = Json {
+            encodeDefaults = true
+            isLenient = true
+            ignoreUnknownKeys = true
+        }
         CoroutineScope(Dispatchers.Main).launch {
             val httpClient = createHttpClient()
             try {
@@ -33,7 +35,8 @@ class InitializationViewModel() : ViewModel() {
                         when (frame) {
                             is Frame.Text -> {
                                 val receivedText = frame.readText()
-                                _messages.emit(receivedText)
+                                val info = json.decodeFromString<BirthdayInfo>(receivedText)
+                                onBirthdayInfoReceived(info)
                             }
 
                             else -> Unit

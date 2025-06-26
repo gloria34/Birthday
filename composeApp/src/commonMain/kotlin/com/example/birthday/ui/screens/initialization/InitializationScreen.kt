@@ -1,4 +1,4 @@
-package com.example.birthday.ui.screens
+package com.example.birthday.ui.screens.initialization
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,11 +10,14 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.navigator.LocalNavigator
+import com.example.birthday.navigation.Birthday
 
 @Composable
 fun InitializationScreen(
     viewModel: InitializationViewModel
 ) {
+    val navigator = LocalNavigator.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -36,7 +39,13 @@ fun InitializationScreen(
             label = { Text("Port") }
         )
         Button(
-            onClick = { viewModel.connectToTheServer() }
+            onClick = {
+                viewModel.connectToTheServer {
+                    navigator?.push(Birthday(
+                          it
+                    ))
+                }
+            }
         ) {
             Text("Connect")
         }

@@ -1,0 +1,28 @@
+package com.example.birthday.ui.theme
+
+object SvgIcons {
+    const val ARROW_BACK = "drawable/arrow_back.svg"
+    const val AVATAR_PLACEHOLDER_BLUE = "drawable/avatar_placeholder_blue.svg"
+    const val AVATAR_PLACEHOLDER_GREEN = "drawable/avatar_placeholder_green.svg"
+    const val AVATAR_PLACEHOLDER_YELLOW = "drawable/avatar_placeholder_yellow.svg"
+    const val CAMERA_ICON_BLUE = "drawable/camera_icon_blue.svg"
+    const val CAMERA_ICON_GREEN = "drawable/camera_icon_green.svg"
+    const val CAMERA_ICON_YELLOW = "drawable/camera_icon_yellow.svg"
+    const val LEFT_SWIRLS = "drawable/left_swirls.svg"
+    const val NANIT_LOGO = "drawable/nanit_logo.svg"
+    const val NUMBER_0 = "drawable/number_0.svg"
+    const val NUMBER_1 = "drawable/number_1.svg"
+    const val NUMBER_2 = "drawable/number_2.svg"
+    const val NUMBER_3 = "drawable/number_3.svg"
+    const val NUMBER_4 = "drawable/number_4.svg"
+    const val NUMBER_5 = "drawable/number_5.svg"
+    const val NUMBER_6 = "drawable/number_6.svg"
+    const val NUMBER_7 = "drawable/number_7.svg"
+    const val NUMBER_8 = "drawable/number_8.svg"
+    const val NUMBER_9 = "drawable/number_9.svg"
+    const val NUMBER_10 = "drawable/number_10.svg"
+    const val NUMBER_11 = "drawable/number_11.svg"
+    const val NUMBER_12 = "drawable/number_12.svg"
+    const val RIGHT_SWIRLS = "drawable/right_swirls.svg"
+    const val SHARE = "drawable/share.svg"
+}
