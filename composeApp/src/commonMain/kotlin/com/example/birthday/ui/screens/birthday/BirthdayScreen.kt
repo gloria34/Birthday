@@ -5,8 +5,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -20,7 +26,9 @@ import com.example.birthday.data.enums.BirthdayTheme
 import com.example.birthday.data.enums.BirthdayTheme.Companion.avatarPlaceholder
 import com.example.birthday.data.enums.BirthdayTheme.Companion.backgroundColor
 import com.example.birthday.data.enums.BirthdayTheme.Companion.backgroundImage
+import com.example.birthday.data.enums.BirthdayTheme.Companion.cameraIcon
 import com.example.birthday.ui.components.PlatformImage
+import com.example.birthday.ui.dialogs.PickImageDialog
 import com.example.birthday.ui.screens.birthday.BirthdayViewModel
 import com.example.birthday.ui.theme.AppColors
 import com.example.birthday.ui.theme.SvgIcons
@@ -33,6 +41,7 @@ fun BirthdayScreen(viewModel: BirthdayViewModel) {
     val birthdayTheme = BirthdayTheme.getBirthdayThemeById(viewModel.birthdayInfo.theme)
     val isAgeInYears = DateTimeUtils.isAgeInYears(viewModel.birthdayInfo.dob)
     val ageIcon = DateTimeUtils.getAgeIcon(viewModel.birthdayInfo.dob)
+    val cameraIcon = birthdayTheme.cameraIcon
     val age = DateTimeUtils.calculateAge(viewModel.birthdayInfo.dob, isAgeInYears)
     val navigator = LocalNavigator.current
 
@@ -46,6 +55,7 @@ fun BirthdayScreen(viewModel: BirthdayViewModel) {
             topBarHeight = topBarHeight,
             isAgeInYears = isAgeInYears,
             age = age,
+            cameraIcon = cameraIcon,
             ageIcon = ageIcon,
             avatarPlaceholder = birthdayTheme.avatarPlaceholder
         )
@@ -64,9 +74,11 @@ private fun BirthdayContent(
     topBarHeight: Dp,
     isAgeInYears: Boolean,
     age: Int,
+    cameraIcon: String,
     ageIcon: String,
     avatarPlaceholder: String
 ) {
+    var showImageDialog by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -107,14 +119,57 @@ private fun BirthdayContent(
                 minHeight = 15.dp
             )
         )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp, start = 55.dp, end = 55.dp)
-        ) {
-            PlatformImage(avatarPlaceholder)
-        }
+        AvatarWithCameraButton(
+            avatarPlaceholder = avatarPlaceholder,
+            cameraIcon = cameraIcon,
+            onCameraClick = {
+                showImageDialog = true
+            }
+        )
         Spacer(modifier = Modifier.height(134.dp))
+    }
+    if (showImageDialog) {
+        PickImageDialog(
+            onDismiss = { showImageDialog = false },
+            onPickCamera = {
+            },
+            onPickGallery = {
+            }
+        )
+    }
+}
+
+@Composable
+fun AvatarWithCameraButton(
+    avatarPlaceholder: String,
+    cameraIcon: String,
+    onCameraClick: () -> Unit
+) {
+    val avatarSizePx = remember { mutableStateOf(0) }
+    val density = LocalDensity.current
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 20.dp, start = 55.dp, end = 55.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        PlatformImage(
+            avatarPlaceholder,
+            modifier = Modifier
+                .onSizeChanged { avatarSizePx.value = it.width } // it.width == it.height for circle
+        )
+        if (avatarSizePx.value > 0) {
+            val radiusPx = avatarSizePx.value / 2f
+            val offsetPx = radiusPx / kotlin.math.sqrt(2f)
+            val offsetDp = with(density) { offsetPx.toDp() }
+            PlatformImage(
+                cameraIcon,
+                modifier = Modifier
+                    .size(36.dp)
+                    .offset(x = offsetDp, y = -offsetDp)
+                    .clickable(onClick = onCameraClick)
+            )
+        }
     }
 }
 
