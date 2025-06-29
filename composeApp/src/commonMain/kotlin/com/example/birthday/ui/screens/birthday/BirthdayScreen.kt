@@ -1,16 +1,26 @@
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
@@ -26,6 +36,7 @@ import com.example.birthday.data.enums.BirthdayTheme
 import com.example.birthday.data.enums.BirthdayTheme.Companion.avatarPlaceholder
 import com.example.birthday.data.enums.BirthdayTheme.Companion.backgroundColor
 import com.example.birthday.data.enums.BirthdayTheme.Companion.backgroundImage
+import com.example.birthday.data.enums.BirthdayTheme.Companion.borderStroke
 import com.example.birthday.data.enums.BirthdayTheme.Companion.cameraIcon
 import com.example.birthday.ui.components.PlatformImage
 import com.example.birthday.ui.dialogs.PickImageDialog
@@ -33,8 +44,20 @@ import com.example.birthday.ui.screens.birthday.BirthdayViewModel
 import com.example.birthday.ui.theme.AppColors
 import com.example.birthday.ui.theme.SvgIcons
 import com.example.birthday.utils.DateTimeUtils
+import com.example.birthday.utils.PermissionCallback
+import com.example.birthday.utils.PermissionStatus
+import com.example.birthday.utils.PermissionType
+import com.example.birthday.utils.createPermissionsManager
+import com.example.birthday.utils.rememberCameraManager
+import com.example.birthday.utils.rememberGalleryManager
 import io.ktor.util.toUpperCasePreservingASCIIRules
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.math.sqrt
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BirthdayScreen(viewModel: BirthdayViewModel) {
     val topBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -43,21 +66,121 @@ fun BirthdayScreen(viewModel: BirthdayViewModel) {
     val ageIcon = DateTimeUtils.getAgeIcon(viewModel.birthdayInfo.dob)
     val cameraIcon = birthdayTheme.cameraIcon
     val age = DateTimeUtils.calculateAge(viewModel.birthdayInfo.dob, isAgeInYears)
+    val borderStroke = birthdayTheme.borderStroke
     val navigator = LocalNavigator.current
+    val coroutineScope = rememberCoroutineScope()
+    val permissionsManager = createPermissionsManager(object : PermissionCallback {
+        override fun onPermissionStatus(
+            permissionType: PermissionType,
+            status: PermissionStatus
+        ) {
+            when (status) {
+                PermissionStatus.GRANTED -> {
+                    when (permissionType) {
+                        PermissionType.CAMERA -> viewModel.launchCamera.value = true
+                        PermissionType.GALLERY -> viewModel.launchGallery.value = true
+                    }
+                }
 
+                else -> {
+                    viewModel.permissionRationalDialog.value = true
+                }
+            }
+        }
+    })
+    val cameraManager = rememberCameraManager {
+        coroutineScope.launch {
+            val bitmap = withContext(Dispatchers.Default) {
+                it?.toImageBitmap()
+            }
+            viewModel.imageBitmap.value = bitmap
+        }
+    }
+    val galleryManager = rememberGalleryManager {
+        coroutineScope.launch {
+            val bitmap = withContext(Dispatchers.Default) {
+                it?.toImageBitmap()
+            }
+            viewModel.imageBitmap.value = bitmap
+        }
+    }
+    if (viewModel.launchGallery.value) {
+        if (permissionsManager.isPermissionGranted(PermissionType.GALLERY)) {
+            galleryManager.launch()
+        } else {
+            permissionsManager.AskPermission(PermissionType.GALLERY)
+        }
+        viewModel.launchGallery.value = false
+    }
+    if (viewModel.launchCamera.value) {
+        if (permissionsManager.isPermissionGranted(PermissionType.CAMERA)) {
+            cameraManager.launch()
+        } else {
+            permissionsManager.AskPermission(PermissionType.CAMERA)
+        }
+        viewModel.launchCamera.value = false
+    }
+    if (viewModel.launchSetting.value) {
+        permissionsManager.LaunchSettings()
+        viewModel.launchSetting.value = false
+    }
+    if (viewModel.permissionRationalDialog.value) {
+        AlertDialog(
+            onDismissRequest = {},
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.permissionRationalDialog.value = false
+                        viewModel.launchSetting.value = true
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AppColors.NavyBlue,
+                        contentColor = AppColors.White
+                    )
+                ) {
+                    Text("Open Settings")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { viewModel.permissionRationalDialog.value = false },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AppColors.NavyBlue,
+                        contentColor = AppColors.White
+                    )
+                ) {
+                    Text("Cancel")
+                }
+            },
+            title = {
+                Text("Permission Required", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            },
+            text = {
+                Text(
+                    "To set a photo of your child, please grant this permission. You can manage permissions in your device settings.",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp),
+                    fontSize = 16.sp
+                )
+            },
+            modifier = Modifier.padding(16.dp)
+        )
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(birthdayTheme.backgroundColor)
     ) {
         BirthdayContent(
-            name = viewModel.birthdayInfo.name ?: "Unknown",
             topBarHeight = topBarHeight,
             isAgeInYears = isAgeInYears,
             age = age,
             cameraIcon = cameraIcon,
             ageIcon = ageIcon,
-            avatarPlaceholder = birthdayTheme.avatarPlaceholder
+            avatarPlaceholder = birthdayTheme.avatarPlaceholder,
+            borderStroke = borderStroke,
+            viewModel = viewModel
         )
         BirthdayBackgroundImage(
             birthdayTheme.backgroundImage,
@@ -70,14 +193,16 @@ fun BirthdayScreen(viewModel: BirthdayViewModel) {
 
 @Composable
 private fun BirthdayContent(
-    name: String,
     topBarHeight: Dp,
     isAgeInYears: Boolean,
     age: Int,
     cameraIcon: String,
     ageIcon: String,
-    avatarPlaceholder: String
+    avatarPlaceholder: String,
+    borderStroke: Color,
+    viewModel: BirthdayViewModel
 ) {
+    val name = viewModel.birthdayInfo.name ?: "Unknown"
     var showImageDialog by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -124,7 +249,9 @@ private fun BirthdayContent(
             cameraIcon = cameraIcon,
             onCameraClick = {
                 showImageDialog = true
-            }
+            },
+            borderStroke = borderStroke,
+            viewModel = viewModel
         )
         Spacer(modifier = Modifier.height(134.dp))
     }
@@ -132,8 +259,10 @@ private fun BirthdayContent(
         PickImageDialog(
             onDismiss = { showImageDialog = false },
             onPickCamera = {
+                viewModel.launchCamera.value = true
             },
             onPickGallery = {
+                viewModel.launchGallery.value = true
             }
         )
     }
@@ -143,6 +272,8 @@ private fun BirthdayContent(
 fun AvatarWithCameraButton(
     avatarPlaceholder: String,
     cameraIcon: String,
+    borderStroke: Color,
+    viewModel: BirthdayViewModel,
     onCameraClick: () -> Unit
 ) {
     val avatarSizePx = remember { mutableStateOf(0) }
@@ -153,14 +284,23 @@ fun AvatarWithCameraButton(
             .padding(top = 20.dp, start = 55.dp, end = 55.dp),
         contentAlignment = Alignment.Center
     ) {
-        PlatformImage(
+        if (viewModel.imageBitmap.value != null) {
+            Image(
+                bitmap = viewModel.imageBitmap.value!!,
+                contentDescription = null,
+                modifier = Modifier
+                    .onSizeChanged { avatarSizePx.value = it.width }.aspectRatio(1.0F)
+                    .border(width = 7.dp, color = borderStroke, shape = CircleShape).clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+        } else PlatformImage(
             avatarPlaceholder,
             modifier = Modifier
-                .onSizeChanged { avatarSizePx.value = it.width } // it.width == it.height for circle
+                .onSizeChanged { avatarSizePx.value = it.width }
         )
         if (avatarSizePx.value > 0) {
             val radiusPx = avatarSizePx.value / 2f
-            val offsetPx = radiusPx / kotlin.math.sqrt(2f)
+            val offsetPx = radiusPx / sqrt(2f)
             val offsetDp = with(density) { offsetPx.toDp() }
             PlatformImage(
                 cameraIcon,

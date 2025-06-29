@@ -17,11 +17,14 @@ object Initialization : Screen {
     }
 }
 
-class Birthday(private val birthdayInfo: BirthdayInfo) : Screen {
+class Birthday(
+    private val name: String?,
+    private val dob: Long,
+    private val theme: String
+) : Screen {
     @Composable
     override fun Content() {
-        BirthdayScreen(
-            BirthdayViewModel(birthdayInfo)
-        )
+        val birthdayInfo = BirthdayInfo(name, dob, theme)
+        BirthdayScreen(BirthdayViewModel(birthdayInfo))
     }
 }

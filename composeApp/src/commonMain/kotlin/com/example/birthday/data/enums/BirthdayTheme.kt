@@ -47,5 +47,12 @@ enum class BirthdayTheme {
                 FOX -> SvgIcons.CAMERA_ICON_GREEN
                 PELICAN -> SvgIcons.CAMERA_ICON_BLUE
             }
+
+        val BirthdayTheme.borderStroke: Color
+            get() = when (this) {
+                ELEPHANT -> AppColors.Amber
+                FOX -> AppColors.Teal
+                PELICAN -> AppColors.LightBlue
+            }
     }
 }

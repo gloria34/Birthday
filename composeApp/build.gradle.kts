@@ -34,6 +34,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.kotlinx.coroutines.android)
+            implementation("com.google.accompanist:accompanist-permissions:0.37.3")
         }
 
         commonMain.dependencies {

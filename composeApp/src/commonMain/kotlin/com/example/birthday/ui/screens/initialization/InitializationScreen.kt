@@ -41,9 +41,13 @@ fun InitializationScreen(
         Button(
             onClick = {
                 viewModel.connectToTheServer {
-                    navigator?.push(Birthday(
-                          it
-                    ))
+                    navigator?.push(
+                        Birthday(
+                            it.name,
+                            it.dob,
+                            it.theme
+                        )
+                    )
                 }
             }
         ) {
