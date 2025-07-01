@@ -10,8 +10,13 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import birthday.composeapp.generated.resources.Res
+import birthday.composeapp.generated.resources.connect_to_the_server
+import birthday.composeapp.generated.resources.ip_address
+import birthday.composeapp.generated.resources.port
 import cafe.adriel.voyager.navigator.LocalNavigator
 import com.example.birthday.navigation.Birthday
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun InitializationScreen(
@@ -25,18 +30,18 @@ fun InitializationScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Connect to the server",
+            text = stringResource(Res.string.connect_to_the_server),
             style = MaterialTheme.typography.titleLarge
         )
         TextField(
             value = viewModel.ip,
             onValueChange = { viewModel.ip = it },
-            label = { Text("IP Address") }
+            label = { Text(stringResource(Res.string.ip_address)) }
         )
         TextField(
             value = viewModel.port.toString(),
             onValueChange = { viewModel.port = it.toIntOrNull() ?: 8080 },
-            label = { Text("Port") }
+            label = { Text(stringResource(Res.string.port)) }
         )
         Button(
             onClick = {

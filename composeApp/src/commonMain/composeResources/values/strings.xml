@@ -1,0 +1,26 @@
+<resources>
+    <string name="connect_to_the_server">Connect to the server</string>
+    <string name="ip_address">IP Address</string>
+    <string name="port">Port</string>
+    <string name="connect">Connect</string>
+    <string name="open_settings">Open Settings</string>
+    <string name="cancel">Cancel</string>
+    <string name="permission_required">Permission Required</string>
+    <string name="to_set_a_photo_of">To set a photo of your child, please grant this permission. You can manage
+        permissions in your device settings.
+    </string>
+    <string name="unknown">Unknown</string>
+    <string name="today_name_is">Today %1$s is</string>
+    <plurals name="age_unit">
+        <item quantity="one">%1$s old</item>
+        <item quantity="other">%1$s old</item>
+    </plurals>
+    <plurals name="years_old">
+        <item quantity="one">year old</item>
+        <item quantity="other">years old</item>
+    </plurals>
+    <plurals name="months_old">
+        <item quantity="one">month old</item>
+        <item quantity="other">months old</item>
+    </plurals>
+</resources>

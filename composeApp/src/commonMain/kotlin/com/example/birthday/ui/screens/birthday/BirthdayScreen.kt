@@ -30,6 +30,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import birthday.composeapp.generated.resources.Res
+import birthday.composeapp.generated.resources.cancel
+import birthday.composeapp.generated.resources.connect_to_the_server
+import birthday.composeapp.generated.resources.months_old
+import birthday.composeapp.generated.resources.open_settings
+import birthday.composeapp.generated.resources.permission_required
+import birthday.composeapp.generated.resources.to_set_a_photo_of
+import birthday.composeapp.generated.resources.today_name_is
+import birthday.composeapp.generated.resources.unknown
+import birthday.composeapp.generated.resources.years_old
 import cafe.adriel.voyager.navigator.LocalNavigator
 import coil3.compose.AsyncImage
 import com.example.birthday.data.enums.BirthdayTheme
@@ -55,6 +64,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.pluralStringResource
+import org.jetbrains.compose.resources.stringResource
 import kotlin.math.sqrt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -138,7 +149,7 @@ fun BirthdayScreen(viewModel: BirthdayViewModel) {
                         contentColor = AppColors.White
                     )
                 ) {
-                    Text("Open Settings")
+                    Text(stringResource(Res.string.open_settings))
                 }
             },
             dismissButton = {
@@ -149,15 +160,15 @@ fun BirthdayScreen(viewModel: BirthdayViewModel) {
                         contentColor = AppColors.White
                     )
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(Res.string.cancel))
                 }
             },
             title = {
-                Text("Permission Required", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(Res.string.permission_required), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
             },
             text = {
                 Text(
-                    "To set a photo of your child, please grant this permission. You can manage permissions in your device settings.",
+                    stringResource(Res.string.to_set_a_photo_of),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 12.dp),
@@ -202,7 +213,7 @@ private fun BirthdayContent(
     borderStroke: Color,
     viewModel: BirthdayViewModel
 ) {
-    val name = viewModel.birthdayInfo.name ?: "Unknown"
+    val name = viewModel.birthdayInfo.name ?: stringResource(Res.string.unknown)
     var showImageDialog by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -217,7 +228,7 @@ private fun BirthdayContent(
             )
         )
         Text(
-            "Today $name is".toUpperCasePreservingASCIIRules(),
+            stringResource(Res.string.today_name_is, name).toUpperCasePreservingASCIIRules(),
             modifier = Modifier
                 .wrapContentSize()
                 .padding(start = 55.dp, end = 55.dp),
@@ -230,8 +241,19 @@ private fun BirthdayContent(
             )
         )
         AgeRow(ageIcon)
+        val ageString = if (isAgeInYears) {
+            pluralStringResource(
+                Res.plurals.years_old,
+                age
+            )
+        } else {
+            pluralStringResource(
+                Res.plurals.months_old,
+                age
+            )
+        }
         Text(
-            "${if (isAgeInYears) if (age == 1) "year" else "years" else if (age == 1) "month" else "months"} old".toUpperCasePreservingASCIIRules(),
+            ageString.toUpperCasePreservingASCIIRules(),
             modifier = Modifier.wrapContentSize().padding(top = 14.dp),
             style = TextStyle(
                 color = AppColors.NavyBlue,
